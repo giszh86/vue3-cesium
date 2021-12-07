@@ -1,4 +1,23 @@
-const Cesium = require("cesium/Cesium");
+import {
+  ArcGisMapServerImageryProvider,
+  BingMapsImageryProvider,
+  BingMapsStyle,
+  GoogleEarthEnterpriseImageryProvider,
+  GoogleEarthEnterpriseMetadata,
+  GridImageryProvider,
+  IonImageryProvider,
+  MapboxImageryProvider,
+  MapboxStyleImageryProvider,
+  OpenStreetMapImageryProvider,
+  SingleTileImageryProvider,
+  Rectangle,
+  TileCoordinatesImageryProvider,
+  TileMapServiceImageryProvider,
+  UrlTemplateImageryProvider,
+  WebMapServiceImageryProvider,
+  WebMapTileServiceImageryProvider,
+  GeographicTilingScheme,
+} from "cesium";
 
 /**
  * @description: 创建一个imageryProvider并返回
@@ -11,7 +30,7 @@ function createImageryProvider(type, url, options) {
   let imageryProvider = null;
   switch (type) {
     case "arcgis":
-      imageryProvider = new Cesium.ArcGisMapServerImageryProvider({
+      imageryProvider = new ArcGisMapServerImageryProvider({
         url: url
       });
       break;
@@ -19,24 +38,24 @@ function createImageryProvider(type, url, options) {
       if (!options.key) {
         throw new Error("使用bing地图必须传入options.key!");
       }
-      imageryProvider = new Cesium.BingMapsImageryProvider({
+      imageryProvider = new BingMapsImageryProvider({
         url: url,
         key: options.key,
         mapStyle: options.mapStyle
-          ? Cesium.BingMapsStyle[options.mapStyle]
-          : Cesium.BingMapsStyle.AERIAL_WITH_LABELS_ON_DEMAND
+          ? BingMapsStyle[options.mapStyle]
+          : BingMapsStyle.AERIAL_WITH_LABELS_ON_DEMAND
       });
       break;
     case "google": // * 提供对托管在Google Earth企业服务器上的数据的访问
-      imageryProvider = new Cesium.GoogleEarthEnterpriseImageryProvider({
-        metaData: new Cesium.GoogleEarthEnterpriseMetaData(url)
+      imageryProvider = new GoogleEarthEnterpriseImageryProvider({
+        metaData: new GoogleEarthEnterpriseMetadata(url)
       });
       break;
     case "grid": // * 地图网格
-      imageryProvider = new Cesium.GridImageryProvider();
+      imageryProvider = new GridImageryProvider();
       break;
-    case "ion": // * 在网站 https://cesium.com/ion/ 注册一个账号;点击"Access Token"，跳转到Access Tokens page页面;选择Default默认的access token拷贝到contents中
-      imageryProvider = new Cesium.IonImageryProvider({
+    case "ion": // * 在网站 https://com/ion/ 注册一个账号;点击"Access Token"，跳转到Access Tokens page页面;选择Default默认的access token拷贝到contents中
+      imageryProvider = new IonImageryProvider({
         assetId: url
       });
       break;
@@ -44,51 +63,51 @@ function createImageryProvider(type, url, options) {
       if (!options.accessToken) {
         throw new Error("使用bing地图必须传入options.accessToken!");
       }
-      imageryProvider = new Cesium.MapboxImageryProvider({
+      imageryProvider = new MapboxImageryProvider({
         mapId: `mapbox.${options.mapId}`,
         accessToken: options.accessToken
       });
       break;
     case "mapboxStyle":
-      imageryProvider = new Cesium.MapboxStyleImageryProvider({
+      imageryProvider = new MapboxStyleImageryProvider({
         styleId: options.styleId,
         accessToken: options.accessToken
       });
       break;
     case "osm":
-      imageryProvider = new Cesium.OpenStreetMapImageryProvider({
+      imageryProvider = new OpenStreetMapImageryProvider({
         fileExtension: "png",
         url: "https://a.tile.openstreetmap.org/"
       });
       break;
     case "singleTile": // * 传入图片的url时要require require("@/assets/cat.jpg")
-      imageryProvider = new Cesium.SingleTileImageryProvider({
+      imageryProvider = new SingleTileImageryProvider({
         url: url,
         rectangle: options.rectangle
-          ? Cesium.Rectangle(
-              options.rectangle[0],
-              options.rectangle[1],
-              options.rectangle[2],
-              options.rectangle[3]
-            )
-          : Cesium.Rectangle(0, 0, 0, 0)
+          ? new Rectangle(
+            options.rectangle[0],
+            options.rectangle[1],
+            options.rectangle[2],
+            options.rectangle[3]
+          )
+          : new Rectangle(0, 0, 0, 0)
       });
       break;
     case "tileCoordinates": // * 网格瓦片 包括网格瓦片等级、X、Y序号
-      imageryProvider = new Cesium.TileCoordinatesImageryProvider();
+      imageryProvider = new TileCoordinatesImageryProvider();
       break;
     case "tileMapService": // * 访问瓦片图的Rest接口
-      imageryProvider = new Cesium.TileMapServiceImageryProvider({
+      imageryProvider = new TileMapServiceImageryProvider({
         url: url
       });
       break;
     case "urlTemplate": // * 通过使用指定的URL模板请求贴图来提供图像。通常用于加载拥有固定规范url的地图,如'xyz'方式的地图
-      imageryProvider = new Cesium.UrlTemplateImageryProvider({
+      imageryProvider = new UrlTemplateImageryProvider({
         url: url
       });
       break;
     case "wms": // * 适用于所有符合wms标准的地图
-      imageryProvider = new Cesium.WebMapServiceImageryProvider({
+      imageryProvider = new WebMapServiceImageryProvider({
         url: url,
         layers: options.layer,
         parameters: {
@@ -98,7 +117,7 @@ function createImageryProvider(type, url, options) {
       });
       break;
     case "wmts": // * 适用于所有符合wmts标准的地图
-      imageryProvider = new Cesium.WebMapTileServiceImageryProvider({
+      imageryProvider = new WebMapTileServiceImageryProvider({
         url: url,
         layer: options.layer,
         style: options.style || "default",
@@ -107,19 +126,19 @@ function createImageryProvider(type, url, options) {
         tileMatrixLabels: options.matrixIds,
         maximumLevel: options.maximumLevel,
         tilingScheme: options.tilingScheme
-          ? new Cesium.GeographicTilingScheme({
-              numberOfLevelZeroTilesX: options.tilingScheme[0],
-              numberOfLevelZeroTilesY: options.tilingScheme[1]
-            })
+          ? new GeographicTilingScheme({
+            numberOfLevelZeroTilesX: options.tilingScheme[0],
+            numberOfLevelZeroTilesY: options.tilingScheme[1]
+          })
           : null,
-        rectangle: options.rectangle
-          ? Cesium.Rectangle(
-              options.rectangle[0],
-              options.rectangle[1],
-              options.rectangle[2],
-              options.rectangle[3]
-            )
-          : Cesium.Rectangle(-180, -90, 180, 90)
+        // rectangle: options.rectangle
+        //   ? new Rectangle(
+        //     options.rectangle[0],
+        //     options.rectangle[1],
+        //     options.rectangle[2],
+        //     options.rectangle[3]
+        //   )
+        //   : new Rectangle(-180, -90, 180, 90)
       });
       break;
     default:
