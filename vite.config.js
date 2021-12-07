@@ -15,7 +15,7 @@ export default defineConfig({
   plugins: [vue(), cesium()],
   resolve: {
     alias: {
-      "/@": pathResolve("src"),
+      "@": pathResolve("src"),
     }
   },
 });
