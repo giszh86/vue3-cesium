@@ -1,14 +1,14 @@
+<template>
+  <div id="cesiumContainer"></div>
+</template>
+
 <script setup>
 import { onMounted } from "vue";
 import { Viewer } from "cesium";
 onMounted(() => {
-  const viewer = new Viewer("cesiumContainer");
+  window.viewer = new Viewer("cesiumContainer");
 });
 </script>
-
-<template>
-  <div id="cesiumContainer"></div>
-</template>
 
 <style>
 #cesiumContainer {
