@@ -17,17 +17,18 @@ import {
   WebMapServiceImageryProvider,
   WebMapTileServiceImageryProvider,
   GeographicTilingScheme,
+  Math,
 } from "cesium";
 
 /**
  * @description: 创建一个imageryProvider并返回
  * @param {*} type 要创建的imageryProvider的类型
  * @param {*} url 地图的地址
- * @param {*} options imageryProvider的配置项
+ * @param {*} options imageryProvider的配置项,可选参数
  * @return {*} 返回一个imageryProvider
  */
-function createImageryProvider(type, url, options) {
-  let imageryProvider = null;
+function createImageryProvider(type, url, options?: any) {
+  let imageryProvider: any = null;
   switch (type) {
     case "arcgis":
       imageryProvider = new ArcGisMapServerImageryProvider({
@@ -48,11 +49,12 @@ function createImageryProvider(type, url, options) {
       break;
     case "google": // * 提供对托管在Google Earth企业服务器上的数据的访问
       imageryProvider = new GoogleEarthEnterpriseImageryProvider({
-        metaData: new GoogleEarthEnterpriseMetadata(url)
+        url: url,
+        metadata: new GoogleEarthEnterpriseMetadata(url)
       });
       break;
     case "grid": // * 地图网格
-      imageryProvider = new GridImageryProvider();
+      imageryProvider = new GridImageryProvider({});
       break;
     case "ion": // * 在网站 https://com/ion/ 注册一个账号;点击"Access Token"，跳转到Access Tokens page页面;选择Default默认的access token拷贝到contents中
       imageryProvider = new IonImageryProvider({
@@ -131,14 +133,14 @@ function createImageryProvider(type, url, options) {
             numberOfLevelZeroTilesY: options.tilingScheme[1]
           })
           : null,
-        // rectangle: options.rectangle
-        //   ? new Rectangle(
-        //     options.rectangle[0],
-        //     options.rectangle[1],
-        //     options.rectangle[2],
-        //     options.rectangle[3]
-        //   )
-        //   : new Rectangle(-180, -90, 180, 90)
+        rectangle: options.rectangle
+          ? Rectangle.fromDegrees(
+            options.rectangle[0],
+            options.rectangle[1],
+            options.rectangle[2],
+            options.rectangle[3]
+          )
+          : new Rectangle(-3.141592653589793, -1.4844222297453324, 3.141592653589793, 1.4844222297453322)
       });
       break;
     default:
