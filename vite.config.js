@@ -17,5 +17,12 @@ export default defineConfig({
     alias: {
       "@": pathResolve("src"),
     }
-  }
+  },
+  server: {
+    host: 'localhost',
+    port: 8519,
+    open: true,
+    strictPort: false,
+    https: false,
+  },
 });
