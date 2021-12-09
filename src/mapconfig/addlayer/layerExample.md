@@ -62,9 +62,18 @@ createImageryProvider("osm")
 ## singleTile
 
 ```js
-createImageryProvider("singleTile", require("@/assets/cat.jpg"), {
-  rectangle: [0, 0, 0, 0]
-})
+createImageryProvider(
+  "singleTile",
+  "http://localhost:8091/Images/cat.jpg",
+  {
+    rectangle: [
+      -3.141592653589793,
+      -1.4844222297453324,
+      3.141592653589793,
+      1.4844222297453322,
+    ],
+  }
+)
 ```
 
 ![singleTile](./displaymap/singleTile.JPG)
