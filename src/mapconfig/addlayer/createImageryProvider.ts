@@ -27,8 +27,9 @@ import {
  * @param {*} options imageryProvider的配置项,可选参数
  * @return {*} 返回一个imageryProvider
  */
-function createImageryProvider(type, url, options?: any) {
+function createImageryProvider(type, url?, options?: any) {
   let imageryProvider: any = null;
+
   switch (type) {
     case "arcgis":
       imageryProvider = new ArcGisMapServerImageryProvider({
@@ -92,7 +93,7 @@ function createImageryProvider(type, url, options?: any) {
             options.rectangle[2],
             options.rectangle[3]
           )
-          : new Rectangle(0, 0, 0, 0)
+          : new Rectangle(-3.141592653589793, -1.4844222297453324, 3.141592653589793, 1.4844222297453322)
       });
       break;
     case "tileCoordinates": // * 网格瓦片 包括网格瓦片等级、X、Y序号
