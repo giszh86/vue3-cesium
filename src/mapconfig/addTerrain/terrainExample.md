@@ -20,7 +20,8 @@ addTerrain(
 ```js
 addTerrain(
   "cesiumTerrain",
-  "http://localhost:8091/jiuzhaigou"
+  "http://localhost:8091/jiuzhaigou",
+  {}
 )
 ```
 
@@ -30,7 +31,7 @@ addTerrain(
 ## ionTerrain
 
 ```js
-addTerrain("ionTerrain")
+addTerrain("ionTerrain", "", {})
 ```
 
 ![ionTerrain](./displayTerrain/ionTerrain.JPG)
