@@ -1,14 +1,18 @@
 import { ArcGISTiledElevationTerrainProvider, CesiumTerrainProvider, createWorldTerrain, EllipsoidTerrainProvider, GoogleEarthEnterpriseTerrainProvider, GoogleEarthEnterpriseMetadata, VRTheWorldTerrainProvider } from "cesium";
 
-function addTerrain(type, url, options = {}) {
+interface optionInfo {
+  token?: string;
+  requestVertexNormals?: boolean;
+  requestWaterMask?: boolean;
+}
+
+function addTerrain(type, url, options: optionInfo) {
   let terrain = null;
   switch (type) {
     case "arcgisTerrain": // * 常用于arcgis地形服务
       terrain = new ArcGISTiledElevationTerrainProvider({
         url: url,
-        token: options.token,
-        hasVertexNormals: options.requestVertexNormals || false, // 请求照明
-        hasWaterMask: options.requestWaterMask || false // 请求水波纹效果
+        token: options.token
       });
       break;
     case "cesiumTerrain": // * 常用于自己部署的地形服务,也是最常用的地形类型
@@ -19,7 +23,7 @@ function addTerrain(type, url, options = {}) {
       });
       break;
     case "ionTerrain": // * Cesium ion提供了全球地形数据服务
-      terrain = new createWorldTerrain({
+      terrain = createWorldTerrain({
         requestVertexNormals: options.requestVertexNormals || false, // 请求照明
         requestWaterMask: options.requestWaterMask || false // 请求水波纹效果
       });
@@ -30,6 +34,7 @@ function addTerrain(type, url, options = {}) {
     // ! 暂无此项示例
     case "googleTerrain": // * Google地球REST API提供平铺地形
       terrain = new GoogleEarthEnterpriseTerrainProvider({
+        url: url,
         metadata: new GoogleEarthEnterpriseMetadata(url)
       });
       break;
