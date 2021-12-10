@@ -36,7 +36,7 @@ onMounted(() => {
       "arcgis",
       "https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer"
     ),
-    terrainProvider: addTerrain("ionTerrain"),
+    terrainProvider: addTerrain("ionTerrain", "", {}),
   });
 
   // * 隐藏版权信息
