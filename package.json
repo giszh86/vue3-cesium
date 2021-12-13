@@ -1,0 +1,27 @@
+{
+  "name": "vue3-cesium-ts",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cesium-navigation-es6": "^2.0.1",
+    "less-loader": "^10.2.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.0-beta.13",
+    "vuex": "^4.0.2",
+    "vuex-composition-helpers": "^2.0.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.0.0",
+    "cesium": "^1.88.0",
+    "less": "^4.1.2",
+    "less-loader": "^10.2.0",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2",
+    "vite-plugin-cesium": "^1.2.11",
+    "vue-tsc": "^0.29.8"
+  }
+}
