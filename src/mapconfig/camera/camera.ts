@@ -1,5 +1,45 @@
-const Cesium = require("cesium/Cesium");
+import { Cartesian3, Rectangle, Viewer, Math, ScreenSpaceEventHandler, ScreenSpaceEventType } from "cesium";
 
+interface IOptions {
+  destination: Array<number>,
+  orientation?: {
+    direction?: Array<number>,
+    up: Array<number>,
+    heading: number,
+    pitch: number,
+    roll: number,
+  },
+  duration: any,
+  maximumHeight: any,
+  pitchAdjustHeight: any,
+  flyOverLongitude: any
+}
+
+class FlagMouse {
+  constructor() {
+  }
+  private _looking: Boolean = false;
+  private _moveForward: Boolean = false;
+  private _moveBackward: Boolean = false;
+  private _moveUp: Boolean = false;
+  private _moveDown: Boolean = false;
+  private _moveLeft: Boolean = false;
+  private _moveRight: Boolean = false;
+  public get looking(): Boolean { return this._looking; }
+  public set looking(value: Boolean) { this._looking = value; }
+  public get moveForward(): Boolean { return this._moveForward; }
+  public set moveForward(value: Boolean) { this._moveForward = value; }
+  public get moveBackward(): Boolean { return this._moveBackward; }
+  public set moveBackward(value: Boolean) { this._moveBackward = value; }
+  public get moveLeft(): Boolean { return this._moveLeft; }
+  public set moveLeft(value: Boolean) { this._moveLeft = value; }
+  public get moveRight(): Boolean { return this._moveRight; }
+  public set moveRight(value: Boolean) { this.moveRight = value; }
+  public get moveUp(): Boolean { return this._moveUp; }
+  public set moveUp(value: Boolean) { this._moveUp = value; }
+  public get moveDown(): Boolean { return this._moveDown; }
+  public set moveDown(value: Boolean) { this._moveDown = value; }
+}
 /**
  * ! cesium中的笛卡尔坐标系介绍
  * ! x轴垂直屏幕向外
@@ -10,8 +50,10 @@ const Cesium = require("cesium/Cesium");
 
 class Camera {
   camera: any;
-  constructor() {
-    this.camera = window.viewer.scene.camera;
+  viewer: Viewer;
+  constructor(viewer: Viewer) {
+    this.viewer = viewer;
+    this.camera = viewer.scene.camera;
   }
   /**
    * @description: 为相机设置位置和角度
@@ -31,29 +73,29 @@ class Camera {
     this.camera.setView({
       destination:
         destination.length === 3
-          ? Cesium.Cartesian3.fromDegrees(
+          ? Cartesian3.fromDegrees(
             destination[0],
             destination[1],
             destination[2]
           )
-          : Cesium.Rectangle.fromDegrees(
+          : Rectangle.fromDegrees(
             destination[0],
             destination[1],
             destination[2],
             destination[3]
           ),
       orientation: {
-        heading: Cesium.Math.toRadians(orientation.heading),
-        pitch: Cesium.Math.toRadians(orientation.pitch),
-        roll: Cesium.Math.toRadians(orientation.roll)
+        heading: Math.toRadians(orientation.heading),
+        pitch: Math.toRadians(orientation.pitch),
+        roll: Math.toRadians(orientation.roll)
       },
       convert: convert
     });
   }
   // * 相机由鼠标控制改变为由键盘控制
   cameraControl() {
-    let scene = window.viewer.scene;
-    let canvas = window.viewer.canvas;
+    let scene = this.viewer.scene;
+    let canvas = this.viewer.canvas;
 
     // * 使焦点聚集在画布
     canvas.setAttribute("tabindex", "0");
@@ -61,7 +103,7 @@ class Camera {
       canvas.focus();
     };
 
-    let ellipsoid = window.viewer.scene.globe.ellipsoid;
+    let ellipsoid = this.viewer.scene.globe.ellipsoid;
 
     // * 禁止鼠标控制相机的默认事件
     // * 禁止旋转
@@ -75,54 +117,53 @@ class Camera {
     // * 禁止自由观看,只能通过旋转和平移改变相机的视图方向
     scene.screenSpaceCameraController.enableLook = false;
 
-    let startMousePosition;
-    let mousePosition;
-    let flags = {
-      looking: false,
-      moveForward: false,
-      moveBackward: false,
-      moveUp: false,
-      moveDown: false,
-      moveLeft: false,
-      moveRight: false
-    };
+    let startMousePosition: Cartesian3;
+    let mousePosition: Cartesian3;
 
-    let handler = new Cesium.ScreenSpaceEventHandler(canvas);
+    const flags = new FlagMouse();
+
+    let handler = new ScreenSpaceEventHandler(canvas);
 
     // * 设置鼠标左键按下时的事件
     handler.setInputAction(function (movement) {
       flags.looking = true;
-      mousePosition = startMousePosition = Cesium.Cartesian3.clone(
+      mousePosition = startMousePosition = Cartesian3.clone(
         movement.position
       );
-    }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+    }, ScreenSpaceEventType.LEFT_DOWN);
 
     // * 设置鼠标移动事件
     handler.setInputAction(function (movement) {
       mousePosition = movement.endPosition;
-    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    }, ScreenSpaceEventType.MOUSE_MOVE);
 
     // * 设置鼠标左键抬起事件
     handler.setInputAction(function () {
       flags.looking = false;
-    }, Cesium.ScreenSpaceEventType.LEFT_UP);
+    }, ScreenSpaceEventType.LEFT_UP);
 
-    function getFlagForKeyCode(keyCode) {
+    function getFlagForKeyCode(keyCode: String, boolean: boolean): void {
       switch (keyCode) {
-        case "W".charCodeAt(0):
-          return "moveForward";
-        case "S".charCodeAt(0):
-          return "moveBackward";
-        case "Q".charCodeAt(0):
-          return "moveUp";
-        case "E".charCodeAt(0):
-          return "moveDown";
-        case "D".charCodeAt(0):
-          return "moveRight";
-        case "A".charCodeAt(0):
-          return "moveLeft";
+        case "KeyW":
+          flags.moveForward = boolean;
+          break;
+        case "KeyS":
+          flags.moveBackward = boolean;
+          break;
+        case "KeyQ":
+          flags.moveUp = boolean;
+          break;
+        case "KeyE":
+          flags.moveDown = boolean;
+          break;
+        case "KeyD":
+          flags.moveRight = boolean;
+          break;
+        case "KeyA":
+          flags.moveLeft = boolean;
+          break;
         default:
-          return undefined;
+          break;
       }
     }
 
@@ -130,10 +171,7 @@ class Camera {
     document.addEventListener(
       "keydown",
       function (e) {
-        let flagName = getFlagForKeyCode(e.keyCode);
-        if (typeof flagName !== "undefined") {
-          flags[flagName] = true;
-        }
+        getFlagForKeyCode(e.code, true);
       },
       false
     );
@@ -142,16 +180,13 @@ class Camera {
     document.addEventListener(
       "keyup",
       function (e) {
-        let flagName = getFlagForKeyCode(e.keyCode);
-        if (typeof flagName !== "undefined") {
-          flags[flagName] = false;
-        }
+        getFlagForKeyCode(e.code, false);
       },
       false
     );
 
     // * 添加时间变化监听
-    window.viewer.clock.onTick.addEventListener(() => {
+    this.viewer.clock.onTick.addEventListener(() => {
       if (flags.looking) {
         let width = canvas.clientWidth;
         let height = canvas.clientHeight;
@@ -199,7 +234,7 @@ class Camera {
   // * 计算椭球上近似可见的矩形,返回矩形或者undefined
   computeViewRectangle() {
     return this.camera.computeViewRectangle(
-      window.viewer.scene.globe.ellipsoid
+      this.viewer.scene.globe.ellipsoid
     );
   }
   /**
@@ -212,16 +247,16 @@ class Camera {
    * @param {*} pitchAdjustHeight 飞行超过这个高度时,调整角度向下看并且保证地球在视口
    * @param {*} flyOverLongitude 指定飞行必须经过的经度
    */
-  flyTo(options) {
+  flyTo(options: IOptions) {
     this.camera.flyTo({
       destination:
         options.destination.length === 3
-          ? Cesium.Cartesian3.fromDegrees(
+          ? Cartesian3.fromDegrees(
             options.destination[0],
             options.destination[1],
             options.destination[2]
           )
-          : Cesium.Rectangle.fromDegrees(
+          : Rectangle.fromDegrees(
             options.destination[0],
             options.destination[1],
             options.destination[2],
@@ -230,21 +265,21 @@ class Camera {
       orientation: options.orientation
         ? options.orientation.direction != undefined
           ? {
-            direction: new Cesium.Cartesian3(
+            direction: new Cartesian3(
               options.orientation.direction[0],
               options.orientation.direction[1],
               options.orientation.direction[1]
             ),
-            up: new Cesium.Cartesian3(
+            up: new Cartesian3(
               options.orientation.up[0],
               options.orientation.up[1],
               options.orientation.up[1]
             )
           }
           : {
-            heading: Cesium.Math.toRadians(options.orientation.heading),
-            pitch: Cesium.Math.toRadians(options.orientation.pitch),
-            roll: Cesium.Math.toRadians(options.orientation.roll)
+            heading: Math.toRadians(options.orientation.heading),
+            pitch: Math.toRadians(options.orientation.pitch),
+            roll: Math.toRadians(options.orientation.roll)
           }
         : undefined,
       duration: options.duration,
