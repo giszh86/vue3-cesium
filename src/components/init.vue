@@ -8,9 +8,10 @@ import { onMounted } from "vue";
 import { Viewer, Rectangle } from "cesium";
 import { useStore } from "vuex";
 import { globalStoreKey } from "../store";
-import { useState, useActions } from "vuex-composition-helpers";
+import { useActions } from "vuex-composition-helpers";
 import createImageryProvider from "../mapconfig/addlayer/createImageryProvider";
 import addTerrain from "../mapconfig/addTerrain/addTerrain";
+import Camera from "../mapconfig/camera/camera";
 
 // 通过key拿到特定的store
 const store = useStore(globalStoreKey);
@@ -75,6 +76,13 @@ onMounted(() => {
   };
 
   new CesiumNavigation(viewer, options);
+
+  let camera = new Camera(viewer);
+  camera.setView([112.419718, 37.927023, 2000.0], {
+    heading: 0,
+    pitch: -45,
+    roll: 0,
+  });
 });
 </script>
 
