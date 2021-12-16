@@ -9,10 +9,10 @@ interface IOptions {
     pitch: number,
     roll: number,
   },
-  duration: any,
-  maximumHeight: any,
-  pitchAdjustHeight: any,
-  flyOverLongitude: any
+  duration?: any,
+  maximumHeight?: any,
+  pitchAdjustHeight?: any,
+  flyOverLongitude?: any
 }
 
 class FlagMouse {
@@ -34,7 +34,7 @@ class FlagMouse {
   public get moveLeft(): Boolean { return this._moveLeft; }
   public set moveLeft(value: Boolean) { this._moveLeft = value; }
   public get moveRight(): Boolean { return this._moveRight; }
-  public set moveRight(value: Boolean) { this.moveRight = value; }
+  public set moveRight(value: Boolean) { this._moveRight = value; }
   public get moveUp(): Boolean { return this._moveUp; }
   public set moveUp(value: Boolean) { this._moveUp = value; }
   public get moveDown(): Boolean { return this._moveDown; }
@@ -92,7 +92,10 @@ class Camera {
       convert: convert
     });
   }
-  // * 相机由鼠标控制改变为由键盘控制
+  /**
+   *@description: 设置可以通过键盘控制相机移动，并且禁止鼠标控制相机的默认事件
+   * w：向前移动；a：向左移动；s：向后移动；d：向右移动；q：向上移动；e：向下移动
+   */
   cameraControl() {
     let scene = this.viewer.scene;
     let canvas = this.viewer.canvas;
@@ -223,15 +226,21 @@ class Camera {
       }
     });
   }
-  // * 取消相机飞行
+  /**
+   *@description: 取消当前相机飞行
+   */
   cancelFlight() {
     return this.camera.cancelFlight();
   }
-  // * 立即完成相机飞行并且相机移动到目的地
+  /**
+   *@description: 立即完成相机飞行并且相机移动到目的地
+   */
   completeFlight() {
     return this.camera.completeFlight();
   }
-  // * 计算椭球上近似可见的矩形,返回矩形或者undefined
+  /**
+   *@description: 计算椭球上近似可见的矩形,返回矩形或者undefined
+   */
   computeViewRectangle() {
     return this.camera.computeViewRectangle(
       this.viewer.scene.globe.ellipsoid
