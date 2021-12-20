@@ -51,3 +51,25 @@ camera.flyTo({
     duration: 5,
   });
 ```
+
+## 相机绕点旋转
+
+```js
+/**
+   * @description: 相机绕某点旋转
+   * @param {number} lng 点的经度，如117.1423291616
+   * @param {number} lat 点的纬度，如39.0645831633
+   * @param {number} height 点的高度，如15.8
+   * @param {number} pitch 相机看点的角度，如果大于0那么则是从地底往上看，所以要为负值，如-30
+   * @param {number} time 给定飞行一周所需时间，如10，单位为秒
+   * @param {number} distance 给定相机距离点多少距离飞行，如5000m
+   * @memberof Camera
+   */
+camera.rotationPosition(117.1423291616, 39.0645831633, 15.8, -30, 10, 500);
+```
+
+## 停止相机绕点旋转
+
+```js
+camera.stopRotation();
+```
