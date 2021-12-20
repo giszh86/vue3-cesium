@@ -1,4 +1,4 @@
-import { Cartesian3, Rectangle, Viewer, Math, ScreenSpaceEventHandler, ScreenSpaceEventType } from "cesium";
+import { Cartesian3, Rectangle, Viewer, Math, ScreenSpaceEventHandler, ScreenSpaceEventType, JulianDate, ClockRange, ClockStep } from "cesium";
 
 interface IOptions {
   destination: Array<number>,
@@ -51,6 +51,7 @@ class FlagMouse {
 class Camera {
   camera: any;
   viewer: Viewer;
+  Exection: any;
   constructor(viewer: Viewer) {
     this.viewer = viewer;
     this.camera = viewer.scene.camera;
@@ -297,7 +298,64 @@ class Camera {
       flyOverLongitude: options.flyOverLongitude
     });
   }
-  // * 获取camera
+  /**
+   * @description: 相机绕某点旋转
+   * @param {number} lng 点的经度，如117.1423291616
+   * @param {number} lat 点的纬度，如39.0645831633
+   * @param {number} height 点的高度，如15.8
+   * @param {number} pitch 相机看点的角度，如果大于0那么则是从地底往上看，所以要为负值，如-30
+   * @param {number} time 给定飞行一周所需时间，如10，单位为秒
+   * @param {number} distance 给定相机距离点多少距离飞行，如5000m
+   * @memberof Camera
+   */
+  rotationPosition(lng: number, lat: number, height: number, pitch: number, time: number, distance: number) {
+    const position: Cartesian3 = Cartesian3.fromDegrees(lng, lat, height);
+    const cameraPitch: number = Math.toRadians(pitch);
+    const angle: number = 360 / time;
+    const cameraDistance: number = distance;
+    const startTime: JulianDate = JulianDate.fromDate(new Date());
+    // 开始时间
+    this.viewer.clock.startTime = startTime.clone();
+    // 当前时间
+    this.viewer.clock.currentTime = startTime.clone();
+    // 行为方式
+    this.viewer.clock.clockRange = ClockRange.CLAMPED;
+    // 时钟设置为当前系统时间; 忽略所有其他设置。
+    this.viewer.clock.clockStep = ClockStep.SYSTEM_CLOCK;
+    // 获取相机当前heading
+    const initialHeading = this.camera.heading;
+    this.Exection = () => {
+      // 当前已经过去的时间，单位s
+      var delTime = JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime);
+      var heading = Math.toRadians(delTime * angle) + initialHeading;
+      this.viewer.scene.camera.setView({
+        destination: position, // 点的坐标
+        orientation: {
+          heading: heading,
+          pitch: cameraPitch,
+
+        }
+      });
+      this.viewer.scene.camera.moveBackward(cameraDistance);
+
+      if (JulianDate.compare(this.viewer.clock.currentTime, this.viewer.clock.stopTime) >= 0) {
+        this.viewer.clock.onTick.removeEventListener(this.Exection);
+      }
+    }
+    this.viewer.clock.onTick.addEventListener(this.Exection);
+  }
+  /**
+   * @description: 停止绕点旋转动画
+   * @memberof Camera
+   */
+  stopRotation() {
+    if (this.Exection) {
+      this.viewer.clock.onTick.removeEventListener(this.Exection);
+    }
+  }
+  /**
+  * 获取camera
+  */
   getCesiumCamera() {
     return this.camera;
   }
