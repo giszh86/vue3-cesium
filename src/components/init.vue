@@ -78,10 +78,15 @@ onMounted(() => {
   new CesiumNavigation(viewer, options);
 
   let camera = new Camera(viewer);
-  camera.setView([112.419718, 37.927023, 2000.0], {
-    heading: 0,
-    pitch: -45,
-    roll: 0,
+  camera.flyTo({
+    destination: [-117.16, 32.71, 15000.0],
+    orientation: {
+      heading: 175.0,
+      pitch: -35.0,
+      roll: 0.0,
+      up: [],
+    },
+    duration: 5,
   });
 });
 </script>
