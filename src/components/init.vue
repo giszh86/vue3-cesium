@@ -12,6 +12,7 @@ import { useActions } from "vuex-composition-helpers";
 import createImageryProvider from "../mapconfig/addlayer/createImageryProvider";
 import addTerrain from "../mapconfig/addTerrain/addTerrain";
 import Camera from "../mapconfig/camera/camera";
+import CesiumWallBillboard from "../mapconfig/cesiumWallBillboard/cesiumWallBillboard";
 
 // 通过key拿到特定的store
 const store = useStore(globalStoreKey);
@@ -39,15 +40,9 @@ onMounted(() => {
     shadows: false, // * 阴影效果
     projectionPicker: false, // * 透视投影和正投影之间切换
     requestRenderMode: true, // * 在指定情况下进行渲染,提高性能
-    imageryProvider: createImageryProvider(
-      "wmts",
-      "http://t0.tianditu.gov.cn/img_w/wmts?tk=c0b9cb30599dd11c468c8aaa2fc1863a",
-      {
-        layer: "img",
-        format: "image/jpeg",
-        tileMatrixSetID: "w",
-      }
-    ),
+    imageryProvider: createImageryProvider("bing", "https://dev.virtualearth.net", {
+      key: "AmXdbd8UeUJtaRSn7yVwyXgQlBBUqliLbHpgn2c76DfuHwAXfRrgS5qwfHU6Rhm8",
+    }),
     terrainProvider: addTerrain("ionTerrain", "", {}),
   });
 
@@ -79,7 +74,7 @@ onMounted(() => {
 
   let camera = new Camera(viewer);
   camera.flyTo({
-    destination: [-117.16, 32.71, 15000.0],
+    destination: [118.05741, 24.630362, 150.0],
     orientation: {
       heading: 175.0,
       pitch: -35.0,
