@@ -5,7 +5,28 @@
 <script setup lang="ts">
 import CesiumNavigation from "cesium-navigation-es6";
 import { onMounted } from "vue";
-import { Viewer, Rectangle } from "cesium";
+import {
+  Viewer,
+  Rectangle,
+  DataSource,
+  HorizontalOrigin,
+  VerticalOrigin,
+  DistanceDisplayCondition,
+  Ellipsoid,
+  BoundingSphere,
+  JulianDate,
+  Color,
+  defined,
+  ClassificationType,
+  ColorMaterialProperty,
+  Entity,
+  PolygonGraphics,
+  Cartesian3,
+  LabelGraphics,
+  ModelGraphics,
+  VelocityOrientationProperty,
+  HermitePolynomialApproximation,
+} from "cesium";
 import { useStore } from "vuex";
 import { globalStoreKey } from "../store";
 import { useActions } from "vuex-composition-helpers";
@@ -13,6 +34,7 @@ import createImageryProvider from "../mapconfig/addlayer/createImageryProvider";
 import addTerrain from "../mapconfig/addTerrain/addTerrain";
 import Camera from "../mapconfig/camera/camera";
 import CesiumWallBillboard from "../mapconfig/cesiumWallBillboard/cesiumWallBillboard";
+import CDataSource from "../mapconfig/dataSource/dataSource";
 
 // 通过key拿到特定的store
 const store = useStore(globalStoreKey);
@@ -82,6 +104,34 @@ onMounted(() => {
       up: [],
     },
     duration: 5,
+  });
+
+  let dataSource = new CDataSource(
+    viewer,
+    "czml",
+    "http://localhost:8091/SampleData/simple.czml"
+  );
+  let dS = dataSource._Init({});
+  dS.then((res: DataSource) => {
+    viewer.dataSources.add(res);
+    let drone = res.entities.getById("Satellite/ISS");
+    // * 替换glb
+    if (drone && drone.position) {
+      drone.model = new ModelGraphics({
+        uri: "http://localhost:8091/SampleData/models/CesiumDrone/CesiumDrone.glb",
+        minimumPixelSize: 128, // * 最小像素大小
+        maximumScale: 1000, // * 最大比例尺寸
+        silhouetteColor: Color.WHITE, // * 轮廓颜色
+        silhouetteSize: 3, // * 轮廓大小
+      });
+      // * 计算并设置模型方向
+      drone.orientation = new VelocityOrientationProperty(drone.position);
+      // * 位置插值使运动平滑
+      // drone.position.setInterpolationOptions({
+      //   interpolationDegree: 3,
+      //   interpolationAlgorithm: HermitePolynomialApproximation, // * 插值算法
+      // });
+    }
   });
 });
 </script>
